@@ -10,15 +10,13 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-               {
-                    sh "mvn clean test"
-                }
+                sh "mvn clean test"
             }
         }
 
         stage('Cleanup') {
             steps {
-                deleteDir() //
+                deleteDir()
             }
         }
     }
