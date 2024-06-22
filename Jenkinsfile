@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+environment {
+        SONAR_TOKEN = credentials('jenkins-token') // Utiliser l'ID de votre token SonarQube enregistré dans Jenkins
+    }
     stages {
         stage('Checkout') {
             steps {
