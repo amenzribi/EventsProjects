@@ -21,7 +21,7 @@ pipeline {
                         mvn sonar:sonar \
                         -Dsonar.projectKey=Jenkins_sonar \
                         -Dsonar.host.url=http://192.168.33.10:9000 \
-                        -Dsonar.login=jenkins-sonar
+                        -Dsonar.login=Tokensonar
                     """
                 }
             }
