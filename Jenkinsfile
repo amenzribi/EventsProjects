@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        SONAR_TOKEN = credentials('jenkins-token') // Utiliser l'ID de votre token SonarQube enregistré dans Jenkins
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -20,12 +16,12 @@ pipeline {
 
         stage('Code Quality Analysis') {
             steps {
-                withSonarQubeEnv('sonar') { // Utiliser le nom de votre SonarQube serveur configuré dans Jenkins
+                withSonarQubeEnv('sonar') {
                     sh """
                         mvn sonar:sonar \
                         -Dsonar.projectKey=Jenkins_sonar \
                         -Dsonar.host.url=http://192.168.33.10:9000 \
-                        -Dsonar.login=$SONAR_TOKEN
+                        -Dsonar.login=your-sonar-token
                     """
                 }
             }
