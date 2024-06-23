@@ -4,60 +4,36 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'Events', changelog: false, credentialsId: '87433cf5-3e8f-4e18-a692-84baeef2322c', poll: false, url: 'https://github.com/amenzribi/EventsProjects.git'
+                checkout scm
             }
         }
-
-        stage('Build and Test') {
+        stage('Build') {
             steps {
-                sh "mvn clean test"
+                sh 'mvn clean package' // Adjust Maven command as needed
             }
         }
-
-        stage('Code Quality Analysis') {
+        stage('Test') {
             steps {
-                withSonarQubeEnv('sonar') {
-                    sh """
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=Jenkins_sonar \
-                        -Dsonar.host.url=http://192.168.33.10:9000 \
-                        -Dsonar.login=admin \
-                        -Dsonar.password=sonarqube
-                    """
+                sh 'mvn test' // Run tests using Maven
+            }
+        }
+        stage('SonarQube Scan') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar' // Execute SonarQube analysis
                 }
             }
         }
-
         stage('Deploy to Nexus') {
             steps {
-                sh "mvn deploy"
-            }
-        }
-
-        stage('Docker Compose Up') {
-            steps {
-                script {
-                    // This stage requires Docker to be installed on your Jenkins agent
-                    sh 'docker-compose up -d'
-                }
-            }
-        }
-
-        stage('Cleanup') {
-            steps {
-                script {
-                    sh 'docker-compose down'
-                }
+                sh 'mvn deploy' // Deploy artifacts to Nexus
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed.'
+        always {
+            junit '**/target/surefire-reports/*.xml' // Publish JUnit test results
         }
     }
 }
