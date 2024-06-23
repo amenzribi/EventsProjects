@@ -64,6 +64,6 @@ public class EventServicesImplTest {
         verify(eventRepository, times(1)).save(event);
     }
 
-// Test with Mockito 
+// Test with Mockito
 
 }
