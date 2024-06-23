@@ -4,36 +4,49 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'Events', changelog: false, credentialsId: '87433cf5-3e8f-4e18-a692-84baeef2322c', poll: false, url: 'https://github.com/amenzribi/EventsProjects.git'
             }
         }
-        stage('Build') {
+
+        stage('Build and Test') {
             steps {
-                sh 'mvn clean package' // Adjust Maven command as needed
+                sh "mvn clean test"
             }
         }
-        stage('Test') {
+
+        stage('Code Quality Analysis') {
             steps {
-                sh 'mvn test' // Run tests using Maven
-            }
-        }
-        stage('SonarQube Scan') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar' // Execute SonarQube analysis
+                withSonarQubeEnv('sonar') {
+                    sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=Jenkins_sonar \
+                        -Dsonar.host.url=http://192.168.33.10:9000 \
+                        -Dsonar.login=admin \
+                        -Dsonar.password=sonarqube
+                    """
                 }
             }
         }
+
         stage('Deploy to Nexus') {
             steps {
-                sh 'mvn deploy' // Deploy artifacts to Nexus
+                sh "mvn deploy"
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                deleteDir()
             }
         }
     }
 
     post {
-        always {
-            junit '**/target/surefire-reports/*.xml' // Publish JUnit test results
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
