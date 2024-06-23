@@ -10,22 +10,34 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-                sh "mvn clean package"
+                sh "mvn clean test"
             }
         }
 
-        stage('Containerize and Deploy') {
+        stage('Code Quality Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=Jenkins_sonar \
+                        -Dsonar.host.url=http://192.168.33.10:9000 \
+                        -Dsonar.login=admin \
+                        -Dsonar.password=sonarqube
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Nexus') {
+            steps {
+                sh "mvn deploy"
+            }
+        }
+
+        stage('Docker Compose Up') {
             steps {
                 script {
-                    // Construire l'image Docker
-                    docker.build("my-events-app")
-
-                    // Démarrer les conteneurs avec Docker Compose
-                    dockerCompose(
-                        credentialsId: 'docker-hub-credentials',
-                        dockerComposeFile: 'docker-compose.yml',
-                        dockerComposePath: '.'
-                    )
+                    sh 'docker-compose up -d'
                 }
             }
         }
@@ -33,6 +45,9 @@ pipeline {
         stage('Cleanup') {
             steps {
                 deleteDir()
+                script {
+                    sh 'docker-compose down'
+                }
             }
         }
     }
