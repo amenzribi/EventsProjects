@@ -28,6 +28,12 @@ pipeline {
             }
         }
 
+        stage('Deploy to Nexus') {
+            steps {
+                sh "mvn deploy"
+            }
+        }
+
         stage('Cleanup') {
             steps {
                 deleteDir()
