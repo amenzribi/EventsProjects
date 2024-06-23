@@ -10,7 +10,7 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-               sh "mvn clean test -X -e"
+                sh "mvn clean test"
             }
         }
 
@@ -37,6 +37,7 @@ pipeline {
         stage('Docker Compose Up') {
             steps {
                 script {
+                    // This stage requires Docker to be installed on your Jenkins agent
                     sh 'docker-compose up -d'
                 }
             }
@@ -44,7 +45,6 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                deleteDir()
                 script {
                     sh 'docker-compose down'
                 }
