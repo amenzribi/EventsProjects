@@ -8,9 +8,19 @@ pipeline {
             }
         }
 
-        stage('Build and Test') {
+        stage('Build') {
             steps {
-                sh "mvn clean test"
+                sh "mvn clean package"
+            }
+        }
+
+        stage('Docker Compose') {
+            steps {
+                script {
+                    sh 'docker-compose down' // Pour arrêter et supprimer les conteneurs existants
+                    sh 'docker-compose build'  // Construire les conteneurs
+                    sh 'docker-compose up -d' // Démarrer les conteneurs en arrière-plan
+                }
             }
         }
 
