@@ -36,7 +36,7 @@ pipeline {
                 sh "mvn deploy".
             }
         }
-        
+
 
         stage('Cleanup') {
             steps {

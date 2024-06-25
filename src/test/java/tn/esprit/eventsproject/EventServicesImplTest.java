@@ -27,7 +27,7 @@ public class EventServicesImplTest {
 
     @Mock
     private ParticipantRepository participantRepository;
-
+//ee
     @Mock
     private LogisticsRepository logisticsRepository;
 
