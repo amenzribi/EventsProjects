@@ -60,7 +60,7 @@ pipeline {
          stage('Push Docker Image to DockerHub') {
                     steps {
                         script {
-                            def dockerImage = 'amenzribi/eventsproject'
+                            def dockerImage = 'amenzribi/alpine'
                             dir('eventsProject') {
                                 sh "docker build -t $dockerImage ."
                                 sh "docker push $dockerImage"
