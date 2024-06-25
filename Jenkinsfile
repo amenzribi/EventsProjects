@@ -45,17 +45,37 @@ pipeline {
                 }
             }
         }
+ stage('Login Docker') {
+            steps {
+                script {
+                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                }
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                script {
+                    def dockerImage = 'amenzribi/alpine'
+
+                    dir('EventsProject') {
+                        sh "docker build -t $dockerImage ."
+                        sh "docker push $dockerImage"
+                    }
+                }
+            }
+        }
 
         stage('Docker Compose') {
             steps {
-                script {
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                dir('DevOps_Project') {
+                    script {
+                        sh 'docker-compose -f docker-compose.yml up -d'
+                    }
                 }
             }
         }
     }
-
     post {
         success {
             echo 'Pipeline completed successfully!'
