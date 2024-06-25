@@ -1,6 +1,10 @@
 pipeline {
     agent any
-
+ environment {
+       DOCKERHUB_CREDENTIALS = credentials('hbaDockerHub')
+       DOCKERHUB_USERNAME = 'amenzribi'
+       DOCKERHUB_PASSWORD = 'dockerhub'
+    }
     stages {
         stage('Checkout') {
             steps {
