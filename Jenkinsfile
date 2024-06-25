@@ -61,7 +61,7 @@ pipeline {
                     steps {
                         script {
                             def dockerImage = 'amenzribi/eventsproject'
-                            dir('EventsProject') {
+                            dir('eventsProject') {
                                 sh "docker build -t $dockerImage ."
                                 sh "docker push $dockerImage"
                             }
@@ -71,7 +71,7 @@ pipeline {
 
         stage('Docker Compose') {
             steps {
-                dir('DevOps_Project') {
+                dir('eventsProject') {
                     script {
                         sh 'docker-compose -f docker-compose.yml up -d'
                     }
