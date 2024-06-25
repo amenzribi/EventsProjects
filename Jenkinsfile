@@ -21,26 +21,26 @@ pipeline {
             }
         }
 
-        stage('SonarQube Integration') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar -Dsonar.projectKey=Jenkins_sonar -Dsonar.host.url=http://192.168.33.10:9000 -Dsonar.login=admin -Dsonar.password=sonarqube'
+        stage('Code Quality Analysis') {
+                    steps {
+                        withSonarQubeEnv('sonar') {
+                            sh """
+                                mvn sonar:sonar \
+                                -Dsonar.projectKey=Jenkins_sonar \
+                                -Dsonar.host.url=http://192.168.33.10:9000 \
+                                -Dsonar.login=admin \
+                                -Dsonar.password=sonarqube
+                            """
+                        }
+                    }
                 }
-            }
-        }
 
-        stage('Deploy to Nexus') {
-            steps {
-                sh "mvn deploy"
-            }
-            post {
-                success {
-                    mail(
-                        subject: "Build Success - ${currentBuild.fullDisplayName}",
-                        body: "Nexus is good",
-                        to: "zribiamen3@gmail.com"
-                    )
+                stage('Deploy to Nexus') {
+                    steps {
+                        sh "mvn deploy"
+                    }
                 }
+
                 failure {
                     mail(
                         subject: "Build Failure - ${currentBuild.fullDisplayName}",
