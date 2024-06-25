@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-       DOCKERHUB_CREDENTIALS = credentials('hbaDockerHub')
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -22,47 +18,30 @@ pipeline {
         }
 
         stage('Code Quality Analysis') {
-                    steps {
-                        withSonarQubeEnv('sonar') {
-                            sh """
-                                mvn sonar:sonar \
-                                -Dsonar.projectKey=Jenkins_sonar \
-                                -Dsonar.host.url=http://192.168.33.10:9000 \
-                                -Dsonar.login=admin \
-                                -Dsonar.password=sonarqube
-                            """
-                        }
-                    }
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=Jenkins_sonar \
+                        -Dsonar.host.url=http://192.168.33.10:9000 \
+                        -Dsonar.login=admin \
+                        -Dsonar.password=sonarqube
+                    """
                 }
+            }
+        }
 
-                stage('Deploy to Nexus') {
-                    steps {
-                        sh "mvn deploy"
-                    }
-                }
-
+        stage('Deploy to Nexus') {
+            steps {
+                sh "mvn deploy"
+            }
+            post {
                 failure {
                     mail(
                         subject: "Build Failure - ${currentBuild.fullDisplayName}",
                         body: "The build has failed in the Jenkins pipeline. Please investigate and take appropriate action.",
                         to: "zribiamen3@gmail.com"
                     )
-                }
-            }
-        }
-
-        stage('Login Docker') {
-            steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-            }
-        }
-
-        stage('Push Docker Image to DockerHub') {
-            steps {
-                script {
-                    def dockerImage = 'amenzribi/eventsproject'
-                    sh "docker build -t $dockerImage ."
-                    sh "docker push $dockerImage"
                 }
             }
         }
