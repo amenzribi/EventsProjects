@@ -36,15 +36,7 @@ pipeline {
                 sh "mvn deploy".
             }
         }
-         stage('Docker Compose') {
-                    steps {
-                        script {
-                            sh 'docker-compose down'
-                            sh 'docker-compose build'
-                            sh 'docker-compose up -d'
-                        }
-                    }
-                }
+        
 
         stage('Cleanup') {
             steps {
