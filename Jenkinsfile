@@ -57,18 +57,17 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to DockerHub') {
-            steps {
-                script {
-                    def dockerImage = 'amenzribi/alpine'
-
-                    dir('EventsProject') {
-                        sh "docker build -t $dockerImage ."
-                        sh "docker push $dockerImage"
+         stage('Push Docker Image to DockerHub') {
+                    steps {
+                        script {
+                            def dockerImage = 'amenzribi/eventsproject'
+                            dir('EventsProject') {
+                                sh "docker build -t $dockerImage ."
+                                sh "docker push $dockerImage"
+                            }
+                        }
                     }
                 }
-            }
-        }
 
         stage('Docker Compose') {
             steps {
