@@ -12,6 +12,7 @@ pipeline {
                 git branch: 'Events', changelog: false, credentialsId: '87433cf5-3e8f-4e18-a692-84baeef2322c', poll: false, url: 'https://github.com/amenzribi/EventsProjects.git'
             }
         }
+
         stage('Test Backend') {
             steps {
                 script {
@@ -19,6 +20,7 @@ pipeline {
                 }
             }
         }
+
         stage('Code Quality Analysis') {
             steps {
                 withSonarQubeEnv('sonar') {
@@ -32,6 +34,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to Nexus') {
             steps {
                 sh "mvn deploy"
@@ -46,6 +49,7 @@ pipeline {
                 }
             }
         }
+
         stage('Login Docker') {
             steps {
                 script {
@@ -53,7 +57,8 @@ pipeline {
                 }
             }
         }
-        stage('Build and Push Docker Image') {
+
+        stage('Push Docker Image to DockerHub') {
             steps {
                 script {
                     def dockerImage = 'amenzribi/eventsproject:1.0.0'
@@ -62,7 +67,8 @@ pipeline {
                 }
             }
         }
-        stage('Deploy with Docker Compose') {
+
+        stage('Docker Compose') {
             steps {
                 script {
                     sh 'docker-compose -f docker-compose.yml up -d'
